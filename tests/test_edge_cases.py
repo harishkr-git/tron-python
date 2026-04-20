@@ -282,7 +282,10 @@ class TestTypeCoercion:
 
         p = Person("Alice", Address("London", "UK"))
         result = rt(p)
-        assert result == {"name": "Alice", "address": {"city": "London", "country": "UK"}}
+        assert result == {
+            "name": "Alice",
+            "address": {"city": "London", "country": "UK"},
+        }
 
     def test_pydantic_v1_model(self):
         """Skip if pydantic is not installed."""
@@ -302,6 +305,7 @@ class TestTypeCoercion:
     def test_try_to_dict_passthrough_for_plain_value(self):
         """try_to_dict must return non-model values unchanged."""
         from tron._utils import try_to_dict
+
         assert try_to_dict(42) == 42
         assert try_to_dict("hello") == "hello"
         assert try_to_dict([1, 2]) == [1, 2]
@@ -424,6 +428,7 @@ class TestBenchmarkUtility:
         """When tiktoken is not installed, a 'note' key must be present."""
         import builtins
         import unittest.mock as mock
+
         real_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
@@ -432,6 +437,7 @@ class TestBenchmarkUtility:
             return real_import(name, *args, **kwargs)
 
         from tron import benchmark_compare
+
         with mock.patch("builtins.__import__", side_effect=mock_import):
             result = benchmark_compare({"a": 1})
         assert "note" in result
@@ -439,6 +445,7 @@ class TestBenchmarkUtility:
 
     def test_print_benchmark_outputs_table(self, capsys):
         from tron import print_benchmark
+
         print_benchmark([{"id": i, "name": f"u{i}"} for i in range(20)])
         captured = capsys.readouterr()
         assert "JSON" in captured.out
@@ -447,6 +454,7 @@ class TestBenchmarkUtility:
 
     def test_print_benchmark_shows_savings(self, capsys):
         from tron import print_benchmark
+
         # Large uniform array — TRON will always be smaller
         print_benchmark([{"id": i, "score": i * 1.5} for i in range(30)])
         captured = capsys.readouterr()
@@ -455,6 +463,7 @@ class TestBenchmarkUtility:
 
     def test_benchmark_empty_object(self):
         from tron import benchmark_compare
+
         result = benchmark_compare({})
         assert result["json"]["chars"] > 0
         assert result["tron"]["chars"] > 0

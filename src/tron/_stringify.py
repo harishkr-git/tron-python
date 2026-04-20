@@ -13,6 +13,7 @@ from ._utils import class_name_from_index, is_finite_float, try_to_dict
 # Value coercion
 # ---------------------------------------------------------------------------
 
+
 def _coerce(value: Any) -> Any:
     """Coerce Python-specific types to TRON-serializable primitives.
 
@@ -43,8 +44,7 @@ def _coerce(value: Any) -> Any:
         return sorted(value, key=str)
     if isinstance(value, bytes):
         raise TypeError(
-            "bytes is not TRON-serializable. "
-            "Encode first: base64.b64encode(b).decode()"
+            "bytes is not TRON-serializable. Encode first: base64.b64encode(b).decode()"
         )
     return value
 
@@ -67,6 +67,7 @@ def _validate_key(key: str) -> str:
 # ---------------------------------------------------------------------------
 # Internal stringifier
 # ---------------------------------------------------------------------------
+
 
 class _Stringifier:
     """Two-pass stateful TRON serializer.
@@ -161,8 +162,7 @@ class _Stringifier:
             return body
 
         header_lines = [
-            f"class {name}: {','.join(keys)}"
-            for keys, name in self._registry.items()
+            f"class {name}: {','.join(keys)}" for keys, name in self._registry.items()
         ]
         return "\n".join(header_lines) + "\n\n" + body
 
@@ -170,6 +170,7 @@ class _Stringifier:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def stringify(value: Any) -> str:
     """Serialize *value* to a TRON-formatted string.

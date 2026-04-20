@@ -68,6 +68,7 @@ def _parse_header(header: str) -> dict[str, list[str]]:
 # Recursive-descent body parser
 # ---------------------------------------------------------------------------
 
+
 class _Parser:
     """Recursive-descent parser for the TRON body.
 
@@ -135,8 +136,7 @@ class _Parser:
 
         ctx = self.text[max(0, self.pos - 10) : self.pos + 20]
         raise ValueError(
-            f"Unexpected token {c!r} at position {self.pos}. "
-            f"Context: ...{ctx!r}..."
+            f"Unexpected token {c!r} at position {self.pos}. Context: ...{ctx!r}..."
         )
 
     # ------------------------------------------------------------------
@@ -158,9 +158,7 @@ class _Parser:
         fields = self.registry[class_name]
 
         if self.pos >= len(self.text) or self.text[self.pos] != "(":
-            got = (
-                self.text[self.pos] if self.pos < len(self.text) else "EOF"
-            )
+            got = self.text[self.pos] if self.pos < len(self.text) else "EOF"
             raise ValueError(
                 f"Expected '(' after class name {class_name!r}, got {got!r}"
             )
@@ -232,7 +230,7 @@ class _Parser:
         if self.pos >= len(self.text) or not self.text[self.pos].isdigit():
             raise ValueError(
                 f"Invalid number at position {self.pos}: "
-                f"{self.text[start:start+10]!r}"
+                f"{self.text[start : start + 10]!r}"
             )
         self._consume_digits()
         # Fractional part
@@ -276,8 +274,7 @@ class _Parser:
                 self.pos += 1
             else:
                 raise ValueError(
-                    f"Expected ',' or '}}' in object, got {ch!r} "
-                    f"at position {self.pos}"
+                    f"Expected ',' or '}}' in object, got {ch!r} at position {self.pos}"
                 )
 
         return result
@@ -306,8 +303,7 @@ class _Parser:
                 self._skip_ws()
             else:
                 raise ValueError(
-                    f"Expected ',' or ']' in array, got {ch!r} "
-                    f"at position {self.pos}"
+                    f"Expected ',' or ']' in array, got {ch!r} at position {self.pos}"
                 )
 
         return result
@@ -325,13 +321,10 @@ class _Parser:
 
     def _expect(self, char: str) -> None:
         if self.pos >= len(self.text):
-            raise ValueError(
-                f"Expected {char!r} at position {self.pos}, got EOF"
-            )
+            raise ValueError(f"Expected {char!r} at position {self.pos}, got EOF")
         if self.text[self.pos] != char:
             raise ValueError(
-                f"Expected {char!r} at position {self.pos}, "
-                f"got {self.text[self.pos]!r}"
+                f"Expected {char!r} at position {self.pos}, got {self.text[self.pos]!r}"
             )
         self.pos += 1
 
@@ -345,6 +338,7 @@ class _Parser:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def parse(text: str) -> Any:
     """Deserialize a TRON-formatted (or plain JSON) string to a Python object.
@@ -379,9 +373,7 @@ def parse(text: str) -> Any:
     [1, 2, 3]
     """
     if not isinstance(text, str):
-        raise TypeError(
-            f"parse() expects a str, got {type(text).__name__!r}"
-        )
+        raise TypeError(f"parse() expects a str, got {type(text).__name__!r}")
 
     # Normalise line endings so Windows CRLF and bare CR don't trip up
     # the blank-line detector.

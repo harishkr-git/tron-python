@@ -163,9 +163,24 @@ class TestRoundtripMedium:
     def test_log_data(self):
         data = {
             "logs": [
-                {"level": "INFO", "ts": "2024-01-15T10:00:00Z", "msg": "Start", "uid": None},
-                {"level": "WARN", "ts": "2024-01-15T10:05:00Z", "msg": "Mem high", "uid": 1234},
-                {"level": "ERROR", "ts": "2024-01-15T10:10:00Z", "msg": "DB down", "uid": 5678},
+                {
+                    "level": "INFO",
+                    "ts": "2024-01-15T10:00:00Z",
+                    "msg": "Start",
+                    "uid": None,
+                },
+                {
+                    "level": "WARN",
+                    "ts": "2024-01-15T10:05:00Z",
+                    "msg": "Mem high",
+                    "uid": 1234,
+                },
+                {
+                    "level": "ERROR",
+                    "ts": "2024-01-15T10:10:00Z",
+                    "msg": "DB down",
+                    "uid": 5678,
+                },
             ]
         }
         assert rt(data) == data

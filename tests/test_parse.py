@@ -118,7 +118,7 @@ class TestClassParsing:
         assert result == [{"x": 1}, {"y": 2}, {"z": 3}]
 
     def test_array_argument(self):
-        tron = "class A: name,tags\n\n" 'A("Alice",["python","tron"])'
+        tron = 'class A: name,tags\n\nA("Alice",["python","tron"])'
         result = parse(tron)
         assert result == {"name": "Alice", "tags": ["python", "tron"]}
 
@@ -135,12 +135,7 @@ class TestClassParsing:
 
 class TestComplexParsing:
     def test_deeply_nested_class_instances(self):
-        tron = (
-            "class A: outer\n"
-            "class B: mid\n"
-            "class C: val\n"
-            "\nA(B(C(42)))"
-        )
+        tron = "class A: outer\nclass B: mid\nclass C: val\n\nA(B(C(42)))"
         assert parse(tron) == {"outer": {"mid": {"val": 42}}}
 
     def test_large_array_of_class_instances(self):
