@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, cast
 
 from ._stringify import stringify
 
@@ -105,8 +105,8 @@ def print_benchmark(value: Any) -> None:
     print(
         _row(
             "JSON",
-            info["json"]["chars"],
-            info["json"].get("tokens"),
+            cast(int, info["json"]["chars"]),
+            cast("int | None", info["json"].get("tokens")),
             "—",
             "—",
         )
@@ -115,10 +115,10 @@ def print_benchmark(value: Any) -> None:
     print(
         _row(
             "TRON",
-            t["chars"],
-            t.get("tokens"),
-            f"{t['char_savings_pct']:+.1f} %",
-            f"{t.get('token_savings_pct', '?'):+.1f} %" if has_tokens else "—",
+            cast(int, t["chars"]),
+            cast("int | None", t.get("tokens")),
+            f"{cast(float, t['char_savings_pct']):+.1f} %",
+            f"{cast(float, t.get('token_savings_pct', 0.0)):+.1f} %" if has_tokens else "—",
         )
     )
     print(sep)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any
+from typing import Any, cast
 
 # ---------------------------------------------------------------------------
 # Header parsing
@@ -223,7 +223,7 @@ class _Parser:
             raise ValueError("Unterminated string in TRON input")
         # Delegate all JSON string decoding (escape sequences, unicode) to
         # the stdlib — no need to re-implement it.
-        return str(json.loads(self.text[start : self.pos]))
+        return cast(str, json.loads(self.text[start : self.pos]))
 
     def _parse_number(self) -> int | float:
         start = self.pos
@@ -246,9 +246,7 @@ class _Parser:
                 self.pos += 1
             self._consume_digits()
         # Delegate int vs float distinction to json.loads
-        result = json.loads(self.text[start : self.pos])
-        assert isinstance(result, (int, float))
-        return result
+        return cast(int | float, json.loads(self.text[start : self.pos]))
 
     def _parse_object(self) -> dict[str, Any]:
         """Parse a plain JSON object ``{…}`` (no class substitution)."""
