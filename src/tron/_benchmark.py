@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from ._stringify import stringify
 
