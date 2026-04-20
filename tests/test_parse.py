@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from tron import parse
 
+from tron import parse
 
 # ============================================================
 # SIMPLE SCENARIOS — pure JSON passthrough

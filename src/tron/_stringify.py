@@ -1,13 +1,13 @@
 """TRON serializer — converts Python objects to TRON-formatted strings."""
 
 from __future__ import annotations
+
 import json
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
 from ._utils import class_name_from_index, is_finite_float, try_to_dict
-
 
 # ---------------------------------------------------------------------------
 # Value coercion

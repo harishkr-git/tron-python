@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from tron import stringify
 
+from tron import stringify
 
 # ============================================================
 # SIMPLE SCENARIOS
