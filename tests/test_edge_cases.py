@@ -299,6 +299,47 @@ class TestTypeCoercion:
         except ImportError:
             pytest.skip("pydantic not installed")
 
+    def test_try_to_dict_passthrough_for_plain_value(self):
+        """try_to_dict must return non-model values unchanged."""
+        from tron._utils import try_to_dict
+        assert try_to_dict(42) == 42
+        assert try_to_dict("hello") == "hello"
+        assert try_to_dict([1, 2]) == [1, 2]
+        assert try_to_dict(None) is None
+
+    def test_try_to_dict_with_dataclass(self):
+        from tron._utils import try_to_dict
+        import dataclasses
+
+        @dataclasses.dataclass
+        class P:
+            x: int
+            y: int
+
+        assert try_to_dict(P(1, 2)) == {"x": 1, "y": 2}
+
+    def test_pydantic_v2_model_dump(self):
+        """Test model_dump path (pydantic v2 style)."""
+        from tron._utils import try_to_dict
+        import unittest.mock as mock
+
+        obj = mock.MagicMock()
+        obj.model_dump.return_value = {"key": "value"}
+        # Remove the 'dict' attribute so only model_dump path is tested
+        del obj.dict
+        result = try_to_dict(obj)
+        assert result == {"key": "value"}
+
+    def test_pydantic_v1_dict_path(self):
+        """Test the .dict() fallback path (pydantic v1 style)."""
+        from tron._utils import try_to_dict
+        import unittest.mock as mock
+
+        obj = mock.MagicMock(spec=["dict"])  # only has .dict(), not model_dump
+        obj.dict.return_value = {"a": 1}
+        result = try_to_dict(obj)
+        assert result == {"a": 1}
+
     def test_tuple_treated_as_list(self):
         data = (1, 2, 3)
         result = rt(data)
@@ -375,3 +416,42 @@ class TestBenchmarkUtility:
 
         result = benchmark_compare([{"a": 1, "b": 2}] * 10)
         assert isinstance(result["tron"]["char_savings_pct"], float)
+
+    def test_benchmark_note_when_no_tiktoken(self):
+        """When tiktoken is not installed, a 'note' key must be present."""
+        import unittest.mock as mock
+        import builtins
+        real_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "tiktoken":
+                raise ImportError("mocked missing tiktoken")
+            return real_import(name, *args, **kwargs)
+
+        from tron import benchmark_compare
+        with mock.patch("builtins.__import__", side_effect=mock_import):
+            result = benchmark_compare({"a": 1})
+        assert "note" in result
+        assert "tiktoken" in result["note"]
+
+    def test_print_benchmark_outputs_table(self, capsys):
+        from tron import print_benchmark
+        print_benchmark([{"id": i, "name": f"u{i}"} for i in range(20)])
+        captured = capsys.readouterr()
+        assert "JSON" in captured.out
+        assert "TRON" in captured.out
+        assert "Chars" in captured.out
+
+    def test_print_benchmark_shows_savings(self, capsys):
+        from tron import print_benchmark
+        # Large uniform array — TRON will always be smaller
+        print_benchmark([{"id": i, "score": i * 1.5} for i in range(30)])
+        captured = capsys.readouterr()
+        # Savings percentage must appear (positive number + %)
+        assert "%" in captured.out
+
+    def test_benchmark_empty_object(self):
+        from tron import benchmark_compare
+        result = benchmark_compare({})
+        assert result["json"]["chars"] > 0
+        assert result["tron"]["chars"] > 0

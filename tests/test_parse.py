@@ -247,8 +247,64 @@ class TestParseErrors:
             parse("class A: x\n\n")
 
     def test_trailing_content_raises(self):
+        # Input must go through our custom parser (has a header + blank line),
+        # otherwise json.loads handles it and gives a different message.
         with pytest.raises(ValueError, match="Unexpected trailing content"):
+            parse("class A: x\n\nA(1) garbage")
+
+    def test_plain_json_trailing_raises(self):
+        # Fast-path (no header): json.loads catches trailing content
+        with pytest.raises(ValueError):
             parse("null extra_garbage")
+
+    def test_missing_open_paren_after_class_name(self):
+        with pytest.raises(ValueError, match="Expected '\\(' after class name"):
+            parse("class A: x\n\nA 1")
+
+    def test_unexpected_char_in_args(self):
+        with pytest.raises(ValueError, match="Expected ',' or '\\)'"):
+            parse("class A: x,y\n\nA(1;2)")
+
+    def test_unterminated_class_instantiation(self):
+        with pytest.raises(ValueError, match="Unterminated"):
+            parse("class A: x,y\n\nA(1,")
+
+    def test_unexpected_token_raises(self):
+        with pytest.raises(ValueError, match="Unexpected token"):
+            parse("class A: x\n\n@bad")
+
+    def test_empty_field_name_in_header_raises(self):
+        with pytest.raises(ValueError, match="empty field"):
+            parse("class A: x,,y\n\nA(1,2,3)")
+
+    def test_unterminated_object_raises(self):
+        with pytest.raises(ValueError, match="Unterminated JSON object"):
+            parse('class A: x\n\n{"key":')
+
+    def test_unterminated_array_raises(self):
+        with pytest.raises(ValueError, match="Unterminated JSON array"):
+            parse("class A: x\n\n[1,2,")
+
+    def test_unexpected_end_of_input(self):
+        with pytest.raises(ValueError, match="Unexpected end of TRON input"):
+            parse("class A: x\n\n")  # body is empty after strip
+
+    def test_invalid_number_raises(self):
+        with pytest.raises(ValueError):
+            parse("class A: x\n\nA(-z)")
+
+    def test_object_key_must_be_string(self):
+        # Object with non-string key should fail gracefully
+        with pytest.raises(ValueError):
+            parse('class A: x\n\n{1:"bad"}')
+
+    def test_unexpected_char_in_object_raises(self):
+        with pytest.raises(ValueError, match="Expected ',' or '}'"):
+            parse('class A: x\n\n{"k":1 "j":2}')
+
+    def test_unexpected_char_in_array_raises(self):
+        with pytest.raises(ValueError, match="Expected ',' or ']'"):
+            parse("class A: x\n\n[1 2]")
 
     def test_invalid_json_raises(self):
         with pytest.raises(ValueError, match="Invalid TRON"):
