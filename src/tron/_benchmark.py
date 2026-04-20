@@ -38,7 +38,9 @@ def benchmark_compare(value: Any) -> dict[str, Any]:
 
     j_chars = len(json_str)
     t_chars = len(tron_str)
-    char_savings = round((1 - t_chars / j_chars) * 100, 1) if j_chars > 0 else 0.0
+    char_savings = (
+        round((1 - t_chars / j_chars) * 100, 1) if j_chars > 0 else 0.0
+    )
 
     result: dict[str, Any] = {
         "json": {"chars": j_chars},
@@ -46,7 +48,7 @@ def benchmark_compare(value: Any) -> dict[str, Any]:
     }
 
     try:
-        import tiktoken  # type: ignore[import]
+        import tiktoken  # type: ignore[import-not-found]
 
         enc = tiktoken.get_encoding("cl100k_base")
         j_tokens = len(enc.encode(json_str))
