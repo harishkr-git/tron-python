@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Union
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Header parsing
@@ -225,7 +225,7 @@ class _Parser:
         # the stdlib — no need to re-implement it.
         return json.loads(self.text[start : self.pos])
 
-    def _parse_number(self) -> Union[int, float]:
+    def _parse_number(self) -> int | float:
         start = self.pos
         if self.text[self.pos] == "-":
             self.pos += 1

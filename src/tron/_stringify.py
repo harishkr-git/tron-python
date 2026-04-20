@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import math
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
@@ -102,7 +101,7 @@ class _Stringifier:
         value = _coerce(value)
 
         if isinstance(value, dict):
-            keys = tuple(_validate_key(str(k)) for k in value.keys())
+            keys = tuple(_validate_key(str(k)) for k in value)
             if keys:  # skip empty dicts — no class needed
                 self._ensure_class(keys)
             for v in value.values():
@@ -135,7 +134,7 @@ class _Stringifier:
         if isinstance(value, (list, tuple)):
             return "[" + ",".join(self._emit(item) for item in value) + "]"
         if isinstance(value, dict):
-            keys = tuple(str(k) for k in value.keys())
+            keys = tuple(str(k) for k in value)
             if not keys:
                 return "{}"
             class_name = self._registry[keys]

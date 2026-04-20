@@ -308,8 +308,9 @@ class TestTypeCoercion:
         assert try_to_dict(None) is None
 
     def test_try_to_dict_with_dataclass(self):
-        from tron._utils import try_to_dict
         import dataclasses
+
+        from tron._utils import try_to_dict
 
         @dataclasses.dataclass
         class P:
@@ -320,8 +321,9 @@ class TestTypeCoercion:
 
     def test_pydantic_v2_model_dump(self):
         """Test model_dump path (pydantic v2 style)."""
-        from tron._utils import try_to_dict
         import unittest.mock as mock
+
+        from tron._utils import try_to_dict
 
         obj = mock.MagicMock()
         obj.model_dump.return_value = {"key": "value"}
@@ -332,8 +334,9 @@ class TestTypeCoercion:
 
     def test_pydantic_v1_dict_path(self):
         """Test the .dict() fallback path (pydantic v1 style)."""
-        from tron._utils import try_to_dict
         import unittest.mock as mock
+
+        from tron._utils import try_to_dict
 
         obj = mock.MagicMock(spec=["dict"])  # only has .dict(), not model_dump
         obj.dict.return_value = {"a": 1}
@@ -419,8 +422,8 @@ class TestBenchmarkUtility:
 
     def test_benchmark_note_when_no_tiktoken(self):
         """When tiktoken is not installed, a 'note' key must be present."""
-        import unittest.mock as mock
         import builtins
+        import unittest.mock as mock
         real_import = builtins.__import__
 
         def mock_import(name, *args, **kwargs):
