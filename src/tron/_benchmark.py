@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 from ._stringify import stringify
 
@@ -38,9 +38,7 @@ def benchmark_compare(value: Any) -> dict[str, Any]:
 
     j_chars = len(json_str)
     t_chars = len(tron_str)
-    char_savings = (
-        round((1 - t_chars / j_chars) * 100, 1) if j_chars > 0 else 0.0
-    )
+    char_savings = round((1 - t_chars / j_chars) * 100, 1) if j_chars > 0 else 0.0
 
     result: dict[str, Any] = {
         "json": {"chars": j_chars},
@@ -118,7 +116,9 @@ def print_benchmark(value: Any) -> None:
             cast(int, t["chars"]),
             cast("int | None", t.get("tokens")),
             f"{cast(float, t['char_savings_pct']):+.1f} %",
-            f"{cast(float, t.get('token_savings_pct', 0.0)):+.1f} %" if has_tokens else "—",
+            f"{cast(float, t.get('token_savings_pct', 0.0)):+.1f} %"
+            if has_tokens
+            else "—",
         )
     )
     print(sep)
