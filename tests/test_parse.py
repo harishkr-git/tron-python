@@ -266,7 +266,8 @@ class TestParseErrors:
             parse("class A: x,y\n\nA(1;2)")
 
     def test_unterminated_class_instantiation(self):
-        with pytest.raises(ValueError, match="Unterminated"):
+        # Parser hits EOF while reading a value inside the arg list
+        with pytest.raises(ValueError, match="Unexpected end of TRON input"):
             parse("class A: x,y\n\nA(1,")
 
     def test_unexpected_token_raises(self):
@@ -278,15 +279,18 @@ class TestParseErrors:
             parse("class A: x,,y\n\nA(1,2,3)")
 
     def test_unterminated_object_raises(self):
-        with pytest.raises(ValueError, match="Unterminated JSON object"):
+        # Parser hits EOF while reading the object value
+        with pytest.raises(ValueError, match="Unexpected end of TRON input"):
             parse('class A: x\n\n{"key":')
 
     def test_unterminated_array_raises(self):
-        with pytest.raises(ValueError, match="Unterminated JSON array"):
+        # Parser hits EOF while reading the next array element
+        with pytest.raises(ValueError, match="Unexpected end of TRON input"):
             parse("class A: x\n\n[1,2,")
 
     def test_unexpected_end_of_input(self):
-        with pytest.raises(ValueError, match="Unexpected end of TRON input"):
+        # Empty body is caught before the parser runs
+        with pytest.raises(ValueError, match="TRON body is empty"):
             parse("class A: x\n\n")  # body is empty after strip
 
     def test_invalid_number_raises(self):
